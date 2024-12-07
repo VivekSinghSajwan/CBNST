@@ -1,0 +1,43 @@
+#include <stdio.h>
+
+int main() 
+{
+    int frames,n;
+    printf("Enter number of frames available: ");
+    scanf("%d", &frames);
+    printf("Enter number of requests: ");
+    scanf("%d", &n);
+    int requests[n];
+    printf("Enter the requests: ");
+    for (int i = 0; i <n; i++)
+        scanf("%d", &requests[i]);
+
+    int pageFaults = 0;
+    int frame[frames]; 
+    int index = 0; 
+    for (int i = 0; i < frames; i++) 
+        frame[i] = -1; 
+
+    for (int i = 0; i < n; i++) 
+    {
+        int page = requests[i];
+        int found = 0;
+        // Check if the page is already in a frame
+        for (int j = 0; j < frames; j++) 
+        {
+            if (frame[j] == page) 
+            {
+                found = 1; 
+                break;
+            }
+        }
+        if(!found) 
+        { 
+            frame[index] = page; 
+            index = (index + 1) % frames; 
+            pageFaults++; 
+        }
+    }
+    printf("Total number of page faults: %d\n", pageFaults);
+    return 0;
+}
