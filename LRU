@@ -1,0 +1,82 @@
+#include<stdio.h>
+#include<stdbool.h>
+#include<string.h>
+#include<limits.h>
+
+struct PageTable
+{
+    int frame_no;
+    int time;
+    bool valid;
+}PT[50];
+bool isPagePresent(struct PageTable PT[],int page)
+{
+    if(PT[page].valid == 1)
+       return true;
+    return false;    
+}
+void updatePageTable(struct PageTable PT[],int page,int fr_no,int status,int access_time)
+{
+    PT[page].valid=status;
+    if(status == 1 )  
+    {  
+      PT[page].time =  access_time;
+      PT[page].frame_no=fr_no;
+    }
+}
+int findLRUPage(struct PageTable PT[], int frame[], int no_of_frames) 
+{
+    int min_time = INT_MAX, lru_index = -1;
+    for (int i = 0; i < no_of_frames; i++) 
+    {
+        if (PT[frame[i]].time < min_time) 
+        {
+            min_time = PT[frame[i]].time;
+            lru_index = i;
+        }
+    }
+    return lru_index;
+}
+
+int main()
+{
+    int i,n,no_of_frames,page_fault=0,current=0;
+    bool flag=false;
+    printf("Enter the no. of pages: ");
+    scanf("%d",&n);
+    int reference_string[n]; 
+    printf("Enter the reference string : ");
+    for(int i=0;i<n;i++)
+     scanf("%d",&reference_string[i]);
+    printf("Enter the no. of frames : ");
+    scanf("%d",&no_of_frames);
+    int frame[no_of_frames];
+    memset(frame,-1,no_of_frames*sizeof(int));
+
+    for(int i=0;i<50;i++)
+      PT[i].valid=0;
+    
+    for (int i = 0; i < n; i++) 
+    {
+        int page = reference_string[i];
+        if (!isPagePresent(PT, page)) 
+        {
+            page_fault++;
+            int replace_index;
+            if (i < no_of_frames)
+                replace_index = i;
+            else {
+                replace_index = findLRUPage(PT, frame, no_of_frames);
+                updatePageTable(PT, frame[replace_index], -1, false, current);
+            }
+            frame[replace_index] = page;
+            updatePageTable(PT, page, replace_index, true, current);
+        }
+        PT[page].time = current++;
+    }
+
+    printf("\nTotal Number of Page Faults = %d\n", page_fault);
+    printf("\nPage Fault Ratio = %.2f\n", (float)page_fault / n);
+    printf("Page Hit Ratio = %.2f\n", (float)(n - page_fault) / n);
+    return 0;
+}
