@@ -1,0 +1,68 @@
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
+
+struct file
+{
+    char name[20];
+    int start, nob;
+    struct block
+    {
+        int bno;
+        struct block* next;
+    }*sb;
+}f[100];
+
+int main()
+{
+    int n;
+    struct block* temp;
+    printf("Enter no. of files: ");
+    scanf("%d",&n);
+    for(int i=0; i<n; i++)
+    {
+        printf("Enter file name: ");
+        scanf("%s",f[i].name);
+        printf("Enter starting block: ");
+        scanf("%d",&f[i].start);
+        printf("Enter no. of blocks: ");
+        scanf("%d",&f[i].nob);
+        f[i].sb = (struct block*)malloc(sizeof(struct block));
+        temp = f[i].sb;
+        printf("Enter blocks for file: ");
+        scanf("%d",&temp->bno);
+        temp->next = NULL;
+        for(int j=1; j<f[i].nob; j++)
+        {
+            temp->next = (struct block*)malloc(sizeof(struct block));
+            temp = temp->next;
+            scanf("%d",&temp->bno);
+        }
+        temp->next = NULL;
+    }
+    printf("Enter the file name to be searched: ");
+    char str[20];
+    scanf("%s",&str);
+    int i;
+    for(i=0; i<n; i++)
+    {
+        if(strcmp(str,f[i].name) == 0)
+            break;
+    }
+    if(i == n)
+        printf("File not exist");
+    else
+    {
+        printf("File Name: %s\n",f[i].name);
+        printf("Starting Block: %d\n",f[i].start);
+        printf("No. of blocks occupied: %d\n",f[i].nob);
+        printf("Blocks occupied: ");
+        temp = f[i].sb;
+        for(int j=0; j<f[i].nob; j++)
+        {
+            printf("%d ",temp->bno);
+            temp = temp->next;
+        }
+    }
+    return 0;
+}
