@@ -1,58 +1,53 @@
-#include <stdio.h>
+//best fit
+#include<stdio.h>
+#include<stdbool.h>
 
-void bestFit(int block[], int b, int process[], int p) 
+int n,m;
+int main()
 {
-    int allocation[p];
-    int occupied[b]; 
-    for (int i = 0; i < p; i++) 
-        allocation[i] = -1;  
-    for (int i = 0; i < b; i++)  
-        occupied[i] = 0;  
+    printf("Enter no. of blocks and processes: ");
+    scanf("%d%d",&n,&m);
+    int blocks[n];
+    int processes[m];
+    printf("Enter n blocks: ");
+    for(int i=0; i<n; i++)
+        scanf("%d",&blocks[i]);
+    printf("Enter m processes: ");
+    for(int i=0; i<m; i++)
+        scanf("%d",&processes[i]);
+    int allocated[m];
+    for(int i=0; i<m; i++)
+        allocated[i] = -1;
+    bool occupied[n];
+    for(int i=0; i<n; i++)
+        occupied[i] = false;
 
-    for (int i = 0; i < p; i++) 
+    for(int i=0; i<m; i++)//process
     {
-        int indx = -1; 
-        for (int j = 0; j < b; j++) 
+        int max = 1000000;
+        int indx = -1;
+        for(int j=0; j<n; j++)
         {
-            if (block[j] >= process[i] && !occupied[j]) 
+            if(occupied[j] == false && (blocks[j] >= processes[i] && blocks[j] < max))
             {
-                if (indx == -1 || block[j] < block[indx])
-                    indx = j;
+                max = blocks[j];
+                indx = j;
             }
         }
-        if (indx != -1) 
+        if(indx != -1)
         {
-            allocation[i] = indx;
-            occupied[indx] = 1;
+            allocated[i] = indx+1;
+            occupied[indx] = true;
         }
     }
-
-    printf("Best Fit Allocation:\n");
-    for (int i = 0; i < p; i++)
+    //answer
+    for(int i=0; i<m; i++)
     {
-        if (allocation[i] != -1)
-            printf("%d - %d\n", process[i], allocation[i] + 1);
-        else
-            printf("%d - no free block available\n", process[i]);
+        printf("%d: ",processes[i]);
+        if(allocated[i] == -1)
+            printf("No blocks available\n");
+        else    
+            printf("%d: \n",allocated[i]);
     }
-}
-
-int main() {
-    int b, p;
-    printf("Enter number of free blocks available: ");
-    scanf("%d", &b);
-    int blocks[b];
-    printf("Enter sizes of %d blocks: ", b);
-    for (int i = 0; i < b; i++)
-        scanf("%d", &blocks[i]);
-
-    printf("Enter number of processes: ");
-    scanf("%d", &p);
-    int processes[p];
-    printf("Enter memory requirements of %d processes: ", p);
-    for (int i = 0; i < p; i++) {
-        scanf("%d", &processes[i]);
-    }
-    bestFit(blocks, b, processes, p);
     return 0;
 }
