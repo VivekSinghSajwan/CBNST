@@ -1,72 +1,65 @@
-#include <stdio.h>
-#include <stdbool.h>
+#include<stdio.h>
+#include<stdbool.h>
 
-int n, m;
-
-bool applySafetyAlgo(int max[n][m], int allocated[n][m], int need[n][m], int available[m], int safeSequence[n]) 
+int n,m;
+bool bankersAlgo(int need[n][m], int allocated[n][m], int available[m], int safeSeq[n])
 {
-    bool finish[n];  // Array to track whether a process has finished
-    int work[m];  // Work array to simulate resource availability during the algorithm
-    for(int i=0; i<m; i++)
-        work[i] = available[i];
-    for(int i=0; i<n; i++) 
+    bool finish[n];
+    for(int i=0; i<n; i++)
         finish[i] = false;
-
-    int k = 0;
+    int k=0;
     bool proceed = true;
-    while(proceed) 
+    while(proceed)
     {
         proceed = false;
-        for(int i=0; i<n; i++) 
+        for(int i=0; i<n; i++)
         {
             bool flag = true;
             if(finish[i] == false)
             {
-                for(int j=0; j<m; j++) 
+                for(int j=0; j<m; j++)
                 {
-                    if(need[i][j] > work[j]) 
+                    if(need[i][j] > available[j])
                     {
                         flag = false;
                         break;
                     }
                 }
-                if(flag) 
+                if(flag == true)
                 {
-                    // Update work (release the resources)
-                    for (int j = 0; j < m; j++)
-                        work[j] += allocated[i][j];
-                    finish[i] = true;
-                    safeSequence[k++] = i;
+                    for(int j=0; j<m; j++)
+                        available[j] += allocated[i][j];
                     proceed = true;
+                    safeSeq[k++] = i;
+                    finish[i] = true;
                 }
             }
         }
     }
-
-    for(int i=0; i<n; i++) 
+    for(int i=0; i<n; i++)
     {
-        if (!finish[i]) 
+        if(finish[i] == false)
             return false;
     }
     return true;
 }
-int main() 
+int main()
 {
-    printf("Enter number of processes: ");
-    scanf("%d", &n);
-    printf("Enter number of resources: ");
-    scanf("%d", &m);
-    int max[n][m], allocated[n][m], need[n][m], available[m], total[m], safeSequence[n];
-    printf("Enter maximum requirement for %d processes:\n", n);
-    for(int i=0; i<n; i++) 
+    printf("Enter no. of processes: ");
+    scanf("%d",&n);
+    printf("Enter no. of resources: ");
+    scanf("%d",&m);
+    int max[n][m],allocated[n][m],need[n][m],total[m],available[m],safeSeq[n];
+    printf("Enter max. requirement for each process: ");
+    for(int i=0; i<n; i++)
     {
-        for(int j=0; j<m; j++) 
-            scanf("%d", &max[i][j]);
+        for(int j=0; j<m; j++)
+            scanf("%d",&max[i][j]);
     }
-    printf("Enter allocated resources for %d processes:\n",n);
-    for(int i=0; i<n; i++) 
+    printf("Enter allocated resources for each process: ");
+    for(int i=0; i<n; i++)
     {
-        for (int j=0; j<m; j++) 
+        for(int j=0; j<m; j++)
         {
             scanf("%d",&allocated[i][j]);
             need[i][j] = max[i][j] - allocated[i][j];
@@ -76,24 +69,20 @@ int main()
     for(int i=0; i<m; i++) 
         scanf("%d", &total[i]);
 
-    //calculating sum of allocated resource
-    int allocatedSum[m];
-    for(int i=0; i<m; i++) 
+    //calculating available
+    for(int i=0; i<m; i++)
     {
-        allocatedSum[i] = 0;
-        for (int j=0; j<n; j++) 
-            allocatedSum[i] += allocated[j][i];
-        available[i] = total[i]-allocatedSum[i];
+        int sum = 0;
+        for(int j=0; j<n; j++)
+            sum += allocated[j][i];
+        available[i] = total[i]-sum;
     }
-    //-----
-    if(applySafetyAlgo(max, allocated, need, available, safeSequence)) 
+    if(bankersAlgo(need,allocated,available,safeSeq))
     {
-        printf("\nSystem is in a SAFE state.\n");
-        printf("Safe sequence is: ");
+        printf("No Deadlock\n");
         for(int i=0; i<n; i++)
-            printf("P[%d] ", safeSequence[i]);
-    } 
-    else 
-        printf("\nSystem is NOT in a safe state.\n");
+            printf("P[%d] ",safeSeq[i]);
+    }else
+        printf("Deadlock Detected");
     return 0;
 }
